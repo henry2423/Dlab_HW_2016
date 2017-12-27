@@ -1,0 +1,367 @@
+{
+	"folder_history":
+	[
+	],
+	"last_version": 3126,
+	"last_window_id": 1,
+	"log_indexing": false,
+	"settings":
+	{
+	},
+	"windows":
+	[
+		{
+			"auto_complete":
+			{
+				"selected_items":
+				[
+					[
+						"add",
+						"add_sum"
+					],
+					[
+						"re",
+						"register"
+					],
+					[
+						"res",
+						"result_o"
+					],
+					[
+						"in",
+						"instruction"
+					]
+				]
+			},
+			"buffers":
+			[
+				{
+					"contents": "`timescale 1ns / 1ps\n//////////////////////////////////////////////////////////////////////////////////\n// Company: \n// Engineer: \n// \n// Create Date:    20:16:10 01/05/2017 \n// Design Name: \n// Module Name:    pc_instruction \n// Project Name: \n// Target Devices: \n// Tool versions: \n// Description: \n//\n// Dependencies: \n//\n// Revision: \n// Revision 0.01 - File Created\n// Additional Comments: \n//\n//////////////////////////////////////////////////////////////////////////////////\nmodule pc_instruction( input clk, input hold, input reset, output [19:0] instruction );\n\nreg [4:0]  pc;\nreg [19:0] data [31:0];\n\nassign instruction = data [ pc ];\n\nalways @( posedge clk )begin\n\tif ( reset )begin\n\t\tpc <= 0;\n\t\tdata[0]  <= 20'b00001111111101111110; // null\n\t\tdata[1]  <= 20'b00110000000010001111; // addi R1, -113\n\t\tdata[2]  <= 20'b00110000001000011011; // addi R3, 27\n\t\tdata[3]  <= 20'b00100000000000000010; // add  R1, R3\n\t\tdata[4]  <= 20'b00000000000000000000; // null\n\t\tdata[5]  <= 20'b00110000000111111010; // addi R2, -6\n\t\tdata[6]  <= 20'b00000000000000000000; // null\n\t\tdata[7]  <= 20'b00110000001100100111; // addi R4, 39\n\t\tdata[8]  <= 20'b01000000000000000001; // sub  R1, R2  \n\t\tdata[9]  <= 20'b11100000000000000011; // and  R1, R4\t\n\t\tdata[10] <= 20'b00000000000000000000; // null\n\t\tdata[11] <= 20'b11000000000000000010; // or   R1, R3\n\t\tdata[12] <= 20'b10000000001000000000; // not  R3\n\t\tdata[13] <= 20'b10100000001000000011; // xor  R3, R4\n\t\tdata[14] <= 20'b01010000001100001010; // subi R4, 10\n\t\tdata[15] <= 20'b00000000000000000000; // null\n\t\tdata[16] <= 20'b00000000000000000000; // null\n\t\tdata[17] <= 20'b11100000001100000000; // and R4, R1\n\t\tdata[18] <= 20'b00000000000000000000; // null\n\t\tdata[19] <= 20'b00000000000000000000; // null\n\t\tdata[20] <= 20'b00000000000000000000; // null\n\t\tdata[21] <= 20'b00000000000000000000; // null\n\t\tdata[22] <= 20'b11100000000000000011; // and R1, R4\n\t\tdata[23] <= 20'b00000000000000000000; // null\n\t\tdata[24] <= 20'b00000000000000000000; // null\n\tend\n\telse if ( hold )begin\n\t\tpc <= pc;\n\tend\n\telse if ( pc != 5'd24 )begin\n\t\tpc <= pc + 1;\n\tend\n\telse begin\n\t\tpc <= pc;\n\tend\nend\n\n\n\n\nendmodule\n",
+					"file": "/D/0416208/final/pc_instruction.v",
+					"file_size": 2211,
+					"file_write_time": 131287862512407167,
+					"settings":
+					{
+						"buffer_size": 2138,
+						"encoding": "UTF-8",
+						"line_ending": "Windows"
+					}
+				},
+				{
+					"contents": "`timescale 1ns / 1ps\n//////////////////////////////////////////////////////////////////////////////////\n// Company: \n// Engineer: \n// \n// Create Date:    20:46:11 01/05/2017 \n// Design Name: \n// Module Name:    data_memory \n// Project Name: \n// Target Devices: \n// Tool versions: \n// Description: \n//\n// Dependencies: \n//\n// Revision: \n// Revision 0.01 - File Created\n// Additional Comments: \n//\n//////////////////////////////////////////////////////////////////////////////////\nmodule data_memory( \n\t\tinput reset,\n\t\tinput clk,\n\t\toutput [8:0] reg1,\n\t\toutput [8:0] reg2,\n\t\toutput [8:0] reg3,\n\t\toutput [8:0] reg4,\n\t\t// if you need more I/O you can add more here\n\t\tinput [19:0] instruction,\n\t\toutput zero_flag\n\t\t); \n\nreg    [8:0] register [3:0];\n\n\n\nassign reg1 = register[0];\nassign reg2 = register[1];\nassign reg3 = register[2];\nassign reg4 = register[3];\n\n/*\n\tYou need to put your code here\n*/\n//I/O ports\nwire signed [7:0]  src1_i;\nwire signed [7:0]  src2_i;\nwire  [3:0]   ctrl_i;\n\nassign zero_flag = (register[src1_i]==0)? 1:0;\n\n\n\n\n//Internal signals\nassign ctrl_i = instruction [19:16] ;\nassign src1_i = instruction [15:8] ;\nassign src2_i = instruction [7:0] ;\n\n\nwire [8:0] add_sum;\nwire [8:0] addi_sum;\nwire [8:0] sub_sum;\nwire [8:0] subi_sum;\nwire add_carry;\nwire addi_carry;\nwire sub_carry;\nwire subi_carry;\n\n\n\naddi add(\n\t.a(register[src1_i][7:0]),\n\t.b(register[src2_i][7:0]),\n\t.sum(add_sum), \n\t.carry_out(add_carry)\n\t);\n\naddi addi(\t\t\n\t.a(register[src1_i][7:0]),\n\t.b(src2_i),\n\t.sum(addi_sum), \n\t.carry_out(addi_carry)\n\t);\n\nsubtract sub(\n\t.a(register[src1_i][7:0]),\n\t.b(register[src2_i][7:0]),\n\t.sum(sub_sum), \n\t.carry_out(sub_carry)\n\t);\n\nsubtract subi(\t\t\n\t.a(register[src1_i][7:0]),\n\t.b(src2_i),\n\t.sum(subi_sum), \n\t.carry_out(subi_carry)\n\t);\n\nreg result;\n\n\n//Main function\n/*your code here*/\nalways @( posedge clk )\nif(reset) begin\n\tregister[0] <= 0;\n\tregister[1] <= 0;\n\tregister[2] <= 0;\t\n\tregister[3] <= 0;\n\tresult <= 0;\n\nend else begin\n\tcase(ctrl_i)\n\t    4'b0000:\t//null\n\t\t\t\t\tresult <= 0;\n\t    4'b0010:\t//add\n\t    \t\t\tregister[src1_i] <= {add_carry,add_sum};     \n\t    4'b0011:\t//addi\n\t                register[src1_i] <= {addi_carry,addi_sum}; \n\t    4'b0100:\t//sub\n\t               \tregister[src1_i] <= {sub_carry,sub_sum};\n\t    4'b0101:\t//subi\n\t                register[src1_i] <= {subi_carry,subi_sum}; \t//becasue src2_i already 2's como\n\t    4'b1110:\t//and\n\t                register[src1_i] <= register[src1_i] & register[src2_i];\n\t    4'b1100:\t//or\n\t    \t\t\tregister[src1_i] <= register[src1_i] | register[src2_i];\n\t    4'b1010:\t//xor\n\t                register[src1_i] <= register[src1_i] ^ register[src2_i];\n\t    4'b1000:\t//not\n\t                register[src1_i] <= ~(register[src1_i]);\n\t    default:\n\t\t\t\t\tresult <= 0;\n  \tendcase\nend\n\nendmodule\n\n\nmodule subtract(a, b, sum, carry_out);\n\tinput [7:0] a, b;\n\toutput [8:0] sum;\n\toutput carry_out;\n\n\twire [8:0] s_com;\n\twire cin, z;\n\tassign s_com = 9'd1;\n\tassign cin = 1'b0;\n\twire [8:0]ta, tb, tc, td;\n\tassign ta[0] = a[0];\n\tassign ta[1] = a[1];\n\tassign ta[2] = a[2];\n\tassign ta[3] = a[3];\n\tassign ta[4] = a[4];\n\tassign ta[5] = a[5];\n\tassign ta[6] = a[6];\n\tassign ta[7] = a[7];\n\tassign ta[8] = a[7];\n\n\tassign tb[0] = b[0];\n\tassign tb[1] = b[1];\n\tassign tb[2] = b[2];\n\tassign tb[3] = b[3];\n\tassign tb[4] = b[4];\n\tassign tb[5] = b[5];\n\tassign tb[6] = b[6];\n\tassign tb[7] = b[7];\n\tassign tb[8] = b[7];\n\tComplement minuend(.M(tb), .S(tc));\t\t//1's complement\n\tFullAdder fa(.A(tc), .B(s_com), .Cin(cin), .S(td), .Cout(z));  //2's complement\n\n\tFullAdder sum1(.A(ta), .B(td), .Cin(cin), .S(sum), .Cout(carry_out));\n\nendmodule\n\n\nmodule addi(a, b, sum, carry_out);\n\tinput [7:0] a, b;\n\toutput [8:0] sum;\n\toutput carry_out;\n\twire cin;\n\tassign cin = 1'b0;\n\n\twire [8:0]aa, ab, tc, td;\n\tassign aa[0] = a[0];\n\tassign aa[1] = a[1];\n\tassign aa[2] = a[2];\n\tassign aa[3] = a[3];\n\tassign aa[4] = a[4];\n\tassign aa[5] = a[5];\n\tassign aa[6] = a[6];\n\tassign aa[7] = a[7];\n\tassign aa[8] = a[7];\n\n\tassign ab[0] = b[0];\n\tassign ab[1] = b[1];\n\tassign ab[2] = b[2];\n\tassign ab[3] = b[3];\n\tassign ab[4] = b[4];\n\tassign ab[5] = b[5];\n\tassign ab[6] = b[6];\n\tassign ab[7] = b[7];\n\tassign ab[8] = b[7];\n\n\tFullAdder sum2(.A(aa), .B(ab), .Cin(cin), .S(sum), .Cout(carry_out));\n\nendmodule\n\n\n\nmodule FullAdder(A, B, Cin, S, Cout);\n\tinput [8:0] A, B;\n\tinput Cin;\n\toutput [8:0] S;\n\toutput Cout;\n\twire [7:0] t;\n\n\n\tFA_1bit FA0(.A(A[0]), .B(B[0]), .Cin(Cin), .S(S[0]), .Cout(t[0]));\n\tFA_1bit FA1(.A(A[1]), .B(B[1]), .Cin(t[0]), .S(S[1]), .Cout(t[1]));\n\tFA_1bit FA2(.A(A[2]), .B(B[2]), .Cin(t[1]), .S(S[2]), .Cout(t[2]));\n\tFA_1bit FA3(.A(A[3]), .B(B[3]), .Cin(t[2]), .S(S[3]), .Cout(t[3]));\n\tFA_1bit FA4(.A(A[4]), .B(B[4]), .Cin(t[3]), .S(S[4]), .Cout(t[4]));\n\tFA_1bit FA5(.A(A[5]), .B(B[5]), .Cin(t[4]), .S(S[5]), .Cout(t[5]));\n\tFA_1bit FA6(.A(A[6]), .B(B[6]), .Cin(t[5]), .S(S[6]), .Cout(t[6]));\n\tFA_1bit FA7(.A(A[7]), .B(B[7]), .Cin(t[6]), .S(S[7]), .Cout(t[7]));\n\tFA_1bit FA8(.A(A[8]), .B(B[8]), .Cin(t[7]), .S(S[8]), .Cout(Cout));\n\nendmodule\n\n// ----------------- A 1-bit full adder ----------------------------- \nmodule FA_1bit(A, B, Cin, S, Cout);\n\tinput A, B, Cin;\n\toutput S, Cout;\n\tassign S = Cin ^ A ^ B;\n\tassign Cout = (A & B) | (Cin & B) | (Cin & A);\n\t\nendmodule\n\n\nmodule Complement(M, S);\n\tinput [8:0]M;\n\toutput [8:0]S;\n\tassign S = ~M;\nendmodule\n",
+					"file": "/D/0416208/final/data_memory.v",
+					"file_size": 5514,
+					"file_write_time": 131287885091198260,
+					"settings":
+					{
+						"buffer_size": 5268,
+						"encoding": "UTF-8",
+						"line_ending": "Windows"
+					}
+				},
+				{
+					"file": "/D/0416208/final/final_project.v",
+					"settings":
+					{
+						"buffer_size": 982,
+						"encoding": "UTF-8",
+						"line_ending": "Windows"
+					}
+				},
+				{
+					"file": "/C/Users/shlab_89/Downloads/sub.v",
+					"settings":
+					{
+						"buffer_size": 2480,
+						"encoding": "UTF-8",
+						"line_ending": "Windows"
+					}
+				}
+			],
+			"build_system": "",
+			"build_system_choices":
+			[
+			],
+			"build_varint": "",
+			"command_palette":
+			{
+				"height": 392.0,
+				"last_filter": "ins",
+				"selected_items":
+				[
+					[
+						"ins",
+						"Package Control: Install Package"
+					]
+				],
+				"width": 432.0
+			},
+			"console":
+			{
+				"height": 126.0,
+				"history":
+				[
+					"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+				]
+			},
+			"distraction_free":
+			{
+				"menu_visible": true,
+				"show_minimap": false,
+				"show_open_files": false,
+				"show_tabs": false,
+				"side_bar_visible": false,
+				"status_bar_visible": false
+			},
+			"file_history":
+			[
+				"/C/Users/shlab_89/Downloads/CalculatorBrain.v"
+			],
+			"find":
+			{
+				"height": 36.0
+			},
+			"find_in_files":
+			{
+				"height": 0.0,
+				"where_history":
+				[
+				]
+			},
+			"find_state":
+			{
+				"case_sensitive": false,
+				"find_history":
+				[
+					"result_o"
+				],
+				"highlight": true,
+				"in_selection": false,
+				"preserve_case": false,
+				"regex": false,
+				"replace_history":
+				[
+				],
+				"reverse": false,
+				"show_context": true,
+				"use_buffer2": true,
+				"whole_word": false,
+				"wrap": true
+			},
+			"groups":
+			[
+				{
+					"selected": 1,
+					"sheets":
+					[
+						{
+							"buffer": 0,
+							"file": "/D/0416208/final/pc_instruction.v",
+							"semi_transient": false,
+							"settings":
+							{
+								"buffer_size": 2138,
+								"regions":
+								{
+								},
+								"selection":
+								[
+									[
+										1898,
+										1887
+									]
+								],
+								"settings":
+								{
+									"syntax": "Packages/Verilog/Verilog.tmLanguage",
+									"translate_tabs_to_spaces": false
+								},
+								"translation.x": 0.0,
+								"translation.y": 300.0,
+								"zoom_level": 1.0
+							},
+							"stack_index": 2,
+							"type": "text"
+						},
+						{
+							"buffer": 1,
+							"file": "/D/0416208/final/data_memory.v",
+							"semi_transient": false,
+							"settings":
+							{
+								"buffer_size": 5268,
+								"regions":
+								{
+								},
+								"selection":
+								[
+									[
+										2130,
+										2140
+									]
+								],
+								"settings":
+								{
+									"syntax": "Packages/Verilog/Verilog.tmLanguage",
+									"translate_tabs_to_spaces": false
+								},
+								"translation.x": 0.0,
+								"translation.y": 0.0,
+								"zoom_level": 1.0
+							},
+							"stack_index": 0,
+							"type": "text"
+						},
+						{
+							"buffer": 2,
+							"file": "/D/0416208/final/final_project.v",
+							"semi_transient": false,
+							"settings":
+							{
+								"buffer_size": 982,
+								"regions":
+								{
+								},
+								"selection":
+								[
+									[
+										543,
+										543
+									]
+								],
+								"settings":
+								{
+									"syntax": "Packages/Verilog/Verilog.tmLanguage"
+								},
+								"translation.x": 0.0,
+								"translation.y": 180.0,
+								"zoom_level": 1.0
+							},
+							"stack_index": 1,
+							"type": "text"
+						},
+						{
+							"buffer": 3,
+							"file": "/C/Users/shlab_89/Downloads/sub.v",
+							"semi_transient": false,
+							"settings":
+							{
+								"buffer_size": 2480,
+								"regions":
+								{
+								},
+								"selection":
+								[
+									[
+										1196,
+										1197
+									]
+								],
+								"settings":
+								{
+									"syntax": "Packages/Verilog/Verilog.tmLanguage"
+								},
+								"translation.x": 0.0,
+								"translation.y": 300.0,
+								"zoom_level": 1.0
+							},
+							"stack_index": 3,
+							"type": "text"
+						}
+					]
+				}
+			],
+			"incremental_find":
+			{
+				"height": 28.0
+			},
+			"input":
+			{
+				"height": 0.0
+			},
+			"layout":
+			{
+				"cells":
+				[
+					[
+						0,
+						0,
+						1,
+						1
+					]
+				],
+				"cols":
+				[
+					0.0,
+					1.0
+				],
+				"rows":
+				[
+					0.0,
+					1.0
+				]
+			},
+			"menu_visible": true,
+			"output.find_results":
+			{
+				"height": 0.0
+			},
+			"pinned_build_system": "",
+			"position": "0,2,1,-32000,-32000,-1,-1,588,50,50,706",
+			"project": "",
+			"replace":
+			{
+				"height": 52.0
+			},
+			"save_all_on_build": true,
+			"select_file":
+			{
+				"height": 0.0,
+				"last_filter": "",
+				"selected_items":
+				[
+				],
+				"width": 0.0
+			},
+			"select_project":
+			{
+				"height": 0.0,
+				"last_filter": "",
+				"selected_items":
+				[
+				],
+				"width": 0.0
+			},
+			"select_symbol":
+			{
+				"height": 0.0,
+				"last_filter": "",
+				"selected_items":
+				[
+				],
+				"width": 0.0
+			},
+			"selected_group": 0,
+			"settings":
+			{
+			},
+			"show_minimap": true,
+			"show_open_files": false,
+			"show_tabs": true,
+			"side_bar_visible": true,
+			"side_bar_width": 150.0,
+			"status_bar_visible": true,
+			"template_settings":
+			{
+			},
+			"window_id": 1,
+			"workspace_name": ""
+		}
+	],
+	"workspaces":
+	{
+		"recent_workspaces":
+		[
+		]
+	}
+}
